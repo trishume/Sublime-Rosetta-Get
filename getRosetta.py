@@ -31,6 +31,8 @@ class GetRosettaCommand(sublime_plugin.WindowCommand):
             u = urllib.urlopen(name + cmcontinue)
             xmldata = u.read()
             u.close()
+            if xmldata.find("cm") == -1: # language doesn't exist
+                return None
             x = xml.dom.minidom.parseString(xmldata)
             titles += [i.getAttribute("title") for i in x.getElementsByTagName("cm")]
             cmcontinue = filter( None,
@@ -48,7 +50,7 @@ class GetRosettaCommand(sublime_plugin.WindowCommand):
         print self.lang
         self.task_list = self.getTasksForLang(self.lang)
         if not self.task_list:
-            sublime.error_message(__name__ + ': Can not get tasks for language ' + self.lang)
+            sublime.error_message(__name__ + ': Can\'t find tasks for language ' + self.lang + ' on Rosetta Code.')
             return
         self.window.show_quick_panel(self.task_list, self.on_done)
 
