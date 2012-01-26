@@ -1,0 +1,7 @@
+[
+    {
+        "id": "tools",
+        "mnemonic": "r",
+        "children": [{ "command": "get_rosetta", "caption": "Rosetta Code" }]
+    }
+]
