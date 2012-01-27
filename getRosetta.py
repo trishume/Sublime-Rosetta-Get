@@ -1,3 +1,6 @@
+import sys
+sys.path.append("/usr/lib/python2.6/lib-dynload/")
+
 import sublime, sublime_plugin, urllib, xml.dom.minidom, re
 
 class GetRosettaCommand(sublime_plugin.WindowCommand):
@@ -5,10 +8,19 @@ class GetRosettaCommand(sublime_plugin.WindowCommand):
         self.window = window
 
     @staticmethod
-    def getLang(scope_string):
-        scopes = scope_string.split(" ")
-        lang = scopes[0].split(".")[1]
-        return lang.capitalize()
+    def getLang(view):
+        scopes = view.settings().get('syntax')
+        lang = scopes.split("/")[1]
+        return lang
+    
+    @staticmethod
+    def codeName(lang):
+        if lang == "Objective-C" or lang == "Objective-C++":
+            return "objc"
+        elif lang == "C++":
+            return "cpp"
+        else:
+            return lang
 
     
     @staticmethod
@@ -46,7 +58,7 @@ class GetRosettaCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.view = self.window.active_view()
-        self.lang = self.getLang(self.view.scope_name(0).strip())
+        self.lang = self.getLang(self.view)
         print self.lang
         self.task_list = self.getTasksForLang(self.lang)
         if not self.task_list:
@@ -58,7 +70,7 @@ class GetRosettaCommand(sublime_plugin.WindowCommand):
         if picked == -1:
             return
         task = self.task_list[picked]
-        prog = self.getCode(self.lang,task)
+        prog = self.getCode(self.codeName(self.lang),task)
         if not prog:
             sublime.error_message(__name__ + ': Can not get task ' + task)
             return
